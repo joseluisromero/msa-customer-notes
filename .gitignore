@@ -1,0 +1,20 @@
+.idea/
+.gradle/
+/build/
+/.mvn/
+/out/
+logs/
+*.iml
+*.class
+/.settings/
+/.classpath
+/.project
+*.log
+
+# IntelliJ
+.idea/
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
