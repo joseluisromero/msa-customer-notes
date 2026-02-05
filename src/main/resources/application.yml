@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_SQL_HOST}:${POSTGRES_SQL_PORT}/${POSTGRES_SQL_DATABASE}
+    driver-class-name: org.postgresql.Driver
+    driverClassName: org.postgresql.Driver
+    username: ${POSTGRES_SQL_USERNAME}
+    password: ${POSTGRES_SQL_PASSWORD}
+    platform: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    # Ensure data.sql runs after JPA has created the schema
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+server:
+  port: 8080
+
+# Using PostgreSQL for development; H2 console entries removed
