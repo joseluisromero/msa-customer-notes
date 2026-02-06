@@ -2,12 +2,14 @@ package com.customer.note.service.impl;
 
 import com.customer.note.dto.NoteDTO;
 import com.customer.note.dto.NoteDetailDTO;
+import com.customer.note.helper.TraceabilityHolder;
 import com.customer.note.model.Note;
 import com.customer.note.model.NoteDetail;
 import com.customer.note.repository.NoteRepository;
 import com.customer.note.service.NoteService;
 import com.customer.note.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,9 +18,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository repository;
+    private final TraceabilityHolder traceabilityHolder;
 
     private NoteDTO toDTO(Note n) {
         List<NoteDetailDTO> details = n.getDetails() == null ? List.of() : n.getDetails().stream()
@@ -48,6 +52,9 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public NoteDTO create(NoteDTO dto) {
+        // Inyectamos el holder. Spring sabe que debe darte los datos de la petición actual.
+       log.info("informacion request {}, traceability {}",dto, traceabilityHolder.getTraceability());
+
         Note e = toEntity(dto);
         if (e.getCreatedAt() == null) e.setCreatedAt(LocalDateTime.now());
         e = repository.save(e);
@@ -77,6 +84,8 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<NoteDTO> findAll() {
+        List<NoteDTO> response=repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        log.info("informacion de todas  las  notas",response.toString());
         return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
