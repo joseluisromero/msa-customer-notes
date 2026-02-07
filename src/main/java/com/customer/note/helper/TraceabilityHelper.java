@@ -8,7 +8,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 @RequestScope
 @Data
-public class TraceabilityHolder {
+public class TraceabilityHelper {
 
     // Este objeto vivirá solo lo que dure la petición HTTP
     private TraceabilityDTO traceability;

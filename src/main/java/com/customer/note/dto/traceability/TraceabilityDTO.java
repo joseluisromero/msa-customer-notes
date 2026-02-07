@@ -1,5 +1,7 @@
 package com.customer.note.dto.traceability;
 
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -7,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -30,6 +34,10 @@ public class TraceabilityDTO {
             message = "El formato de x-device-ip no es válido"
     )
     private String xDeviceIp;
+
     private String xSession;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime requestDate;
 
 }

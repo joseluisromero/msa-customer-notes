@@ -18,9 +18,9 @@ import java.util.List;
 public class Note {
 
     @Id
-    @Column(name = "node_id")
+    @Column(name = "note_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long nodeId;
+    private Long noteId;
 
     @Column(nullable = false)
     private String title;

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ProblemDetail {
     String title;
     String detail;
     List<DetailError> errors;
-    Date timestamp;
+    LocalDateTime timestamp;
     String message;
     String instance;
     String type;

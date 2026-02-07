@@ -13,7 +13,7 @@ import java.util.List;
 public class NoteDTO {
 
 
-    private Long nodeId;
+    private Long noteId;
 
     @NotBlank(message = "title is required")
     private String title;

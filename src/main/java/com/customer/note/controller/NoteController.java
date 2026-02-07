@@ -1,8 +1,10 @@
 package com.customer.note.controller;
 
 import com.customer.note.dto.NoteDTO;
+import com.customer.note.helper.TraceabilityHelper;
 import com.customer.note.service.NoteService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +16,11 @@ import java.util.List;
 @RequestMapping("/api/notes")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class NoteController {
 
     private final NoteService service;
+    private final TraceabilityHelper traceabilityHelper;
 
     @PostMapping
     public ResponseEntity<NoteDTO> create(@Valid @RequestBody NoteDTO dto) {
@@ -31,6 +35,7 @@ public class NoteController {
 
     @GetMapping
     public ResponseEntity<List<NoteDTO>> all() {
+        log.info("Obteniendo todas las notas, traceability {}", traceabilityHelper.getTraceability());
         return ResponseEntity.ok(service.findAll());
     }
 

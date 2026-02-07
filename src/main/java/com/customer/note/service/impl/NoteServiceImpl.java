@@ -2,7 +2,7 @@ package com.customer.note.service.impl;
 
 import com.customer.note.dto.NoteDTO;
 import com.customer.note.dto.NoteDetailDTO;
-import com.customer.note.helper.TraceabilityHolder;
+import com.customer.note.helper.TraceabilityHelper;
 import com.customer.note.model.Note;
 import com.customer.note.model.NoteDetail;
 import com.customer.note.repository.NoteRepository;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository repository;
-    private final TraceabilityHolder traceabilityHolder;
+    private final TraceabilityHelper traceabilityHelper;
 
     private NoteDTO toDTO(Note n) {
         List<NoteDetailDTO> details = n.getDetails() == null ? List.of() : n.getDetails().stream()
@@ -30,7 +30,7 @@ public class NoteServiceImpl implements NoteService {
                 .collect(Collectors.toList());
 
         return NoteDTO.builder()
-                .nodeId(n.getNodeId())
+                .noteId(n.getNoteId())
                 .title(n.getTitle())
                 .details(details)
                 .createdAt(n.getCreatedAt())
@@ -43,7 +43,7 @@ public class NoteServiceImpl implements NoteService {
                 .collect(Collectors.toList());
 
         return Note.builder()
-                .nodeId(dto.getNodeId())
+                .noteId(dto.getNoteId())
                 .title(dto.getTitle())
                 .details(details)
                 .createdAt(dto.getCreatedAt())
@@ -53,7 +53,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDTO create(NoteDTO dto) {
         // Inyectamos el holder. Spring sabe que debe darte los datos de la petición actual.
-       log.info("informacion request {}, traceability {}",dto, traceabilityHolder.getTraceability());
+       log.info("informacion request {}, traceability {}",dto, traceabilityHelper.getTraceability());
 
         Note e = toEntity(dto);
         if (e.getCreatedAt() == null) e.setCreatedAt(LocalDateTime.now());
@@ -67,7 +67,7 @@ public class NoteServiceImpl implements NoteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Note not found with nodeId: " + nodeId));
 
         existing.setTitle(dto.getTitle());
-        existing.setNodeId(dto.getNodeId());
+        existing.setNoteId(dto.getNoteId());
         existing.setDetails(dto.getDetails() == null ? List.of() : dto.getDetails().stream()
                 .map(d -> NoteDetail.builder().key(d.getKey()).value(d.getValue()).sensitive(d.getSensitive()).build())
                 .collect(Collectors.toList()));
