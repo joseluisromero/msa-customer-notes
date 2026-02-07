@@ -5,11 +5,13 @@ import com.customer.note.dto.NoteDetailDTO;
 import com.customer.note.dto.error.DetailError;
 import com.customer.note.dto.error.ProblemDetail;
 import com.customer.note.exception.CustomServiceException;
+import com.customer.note.helper.SecretKeyHelper;
 import com.customer.note.helper.TraceabilityHelper;
 import com.customer.note.model.Note;
 import com.customer.note.model.NoteDetail;
 import com.customer.note.model.enums.CodeValidationEnum;
 import com.customer.note.repository.NoteRepository;
+import com.customer.note.service.CryptoService;
 import com.customer.note.service.NoteService;
 import com.customer.note.util.ConverterErrorUtil;
 import com.customer.note.util.NoteDataUtil;
@@ -28,7 +30,9 @@ import java.util.stream.Collectors;
 public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository repository;
-    private final TraceabilityHelper traceabilityHelper;
+private final TraceabilityHelper traceabilityHelper;
+    private final CryptoService cryptoService;
+    private final SecretKeyHelper secretKeyHelper;
 
     private NoteDTO toDTO(Note n) {
         List<NoteDetailDTO> details = n.getDetails() == null ? List.of() : n.getDetails().stream().map(d -> NoteDetailDTO.builder().key(d.getKey()).value(d.getValue()).sensitive(d.getSensitive()).build()).collect(Collectors.toList());
@@ -45,9 +49,14 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDTO create(NoteDTO dto) {
         // Inyectamos el holder. Spring sabe que debe darte los datos de la petición actual.
-        log.info("informacion request {}, traceability {}", dto, traceabilityHelper.getTraceability());
-
         Note e = toEntity(dto);
+        e.getDetails().stream().forEach(d -> {
+            if (d.getSensitive() != null && d.getSensitive()) {
+                String encryptedValue = cryptoService.encrypt(d.getValue(), secretKeyHelper.vaultKey());
+                d.setValue(encryptedValue);
+                log.info("El valor de la nota es sensible value {}, encriptada es {}", d.getValue(), encryptedValue);
+            }
+        });
         if (e.getCreatedAt() == null) e.setCreatedAt(LocalDateTime.now());
         e = repository.save(e);
         return toDTO(e);
@@ -98,10 +107,35 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    public List<NoteDTO> findByTitle(String title) {
+        List<NoteDTO> response = repository.findByTitleContainingIgnoreCase(title).stream().map(this::toDTO).collect(Collectors.toList());
+        response.stream().forEach(n -> {
+            n.getDetails().stream().forEach(d -> {
+                if (d.getSensitive() != null && d.getSensitive()) {
+                    String decryptedValue = cryptoService.decrypt(d.getValue(), secretKeyHelper.vaultKey());
+                    d.setValue(decryptedValue);
+                    log.info("El valor de la nota es sensible value {}, desencripytada es {}", d.getValue(), decryptedValue);
+                }
+            });
+        });
+        log.info("informacion de todas  las  notas", response.toString());
+        return response ;
+    }
+
+    @Override
     public List<NoteDTO> findAll() {
         List<NoteDTO> response = repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        response.stream().forEach(n -> {
+            n.getDetails().stream().forEach(d -> {
+                if (d.getSensitive() != null && d.getSensitive()) {
+                    String decryptedValue = cryptoService.decrypt(d.getValue(), secretKeyHelper.vaultKey());
+                    d.setValue(decryptedValue);
+                    log.info("El valor de la nota es sensible value {}, desencripytada es {}", d.getValue(), decryptedValue);
+                }
+            });
+        });
         log.info("informacion de todas  las  notas", response.toString());
-        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        return response ;
     }
 
     @Override

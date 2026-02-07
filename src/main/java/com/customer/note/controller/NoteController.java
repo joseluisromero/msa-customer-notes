@@ -59,6 +59,13 @@ public class NoteController {
         return ResponseEntity.ok(service.findById(noteId));
     }
 
+    @GetMapping("/content/{title}")
+    public ResponseEntity<List<NoteDTO>> getByTitle(@PathVariable String title) {
+        String methodName = getMethodName();
+        log.info("Service {},Component {}, Request ={}, Traceability={}", "NoteController", methodName, title, traceabilityHelper.getTraceability());
+        return ResponseEntity.ok(service.findByTitle(title));
+    }
+
     @DeleteMapping("/{noteId}")
     public ResponseEntity<Void> delete(@PathVariable Long noteId) {
         String methodName = getMethodName();
