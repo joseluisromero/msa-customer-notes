@@ -15,10 +15,10 @@ public class NoteDTO {
 
     private Long noteId;
 
-    @NotBlank(message = "title is required")
+    @NotBlank(message = "002")
     private String title;
 
-    @NotNull(message = "details is required")
+    @NotNull(message = "003")
     private List<NoteDetailDTO> details;
 
     private LocalDateTime createdAt;
