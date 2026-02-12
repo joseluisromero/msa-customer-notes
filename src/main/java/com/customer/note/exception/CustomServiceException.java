@@ -17,8 +17,4 @@ public class CustomServiceException extends RuntimeException {
         this.problemDetail = problemDetail;
         this.httpStatus = httpStatus;
     }
-
-    public CustomServiceException(String message, Throwable exception) {
-        super(message);
-    }
 }
