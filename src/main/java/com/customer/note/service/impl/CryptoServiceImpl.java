@@ -75,7 +75,8 @@ public class CryptoServiceImpl implements CryptoService {
 
             return new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Error al desencriptar el valor {}, error {}", encrypted, e.getMessage());
         }
+        return "Error al desencriptar el valor";
     }
 }
